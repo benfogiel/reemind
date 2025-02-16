@@ -1,0 +1,19 @@
+/* ViewCategories.css */
+.content-container {
+    display: flex;
+  }
+  
+  .categories-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .save-button {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }

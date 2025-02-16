@@ -1,8 +1,11 @@
 import { Redirect, Route } from 'react-router-dom';
+import { useState } from "react";
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
-import ViewMessage from './pages/ViewMessage';
+
+import ViewCategories from './pages/ViewCategories';
+import ViewReminders from './pages/ViewReminders';
+import { Category } from './data/categories';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -36,22 +39,30 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route path="/" exact={true}>
-          <Redirect to="/home" />
-        </Route>
-        <Route path="/home" exact={true}>
-          <Home />
-        </Route>
-        <Route path="/message/:id">
-           <ViewMessage />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route path="/" exact={true}>
+            <Redirect to="/categories-view" />
+          </Route>
+          <Route path="/categories-view" exact={true}>
+            <ViewCategories
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
+            />
+          </Route>
+          <Route path="/reminders-view" exact={true}>
+            <ViewReminders categories={selectedCategories}/>
+          </Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;

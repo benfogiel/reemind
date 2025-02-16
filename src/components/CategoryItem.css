@@ -1,0 +1,16 @@
+/* CategoryItem.css */
+
+.category-item {
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-item-content {
+  font-size: clamp(8px, min(20%, 20%), 16px);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
