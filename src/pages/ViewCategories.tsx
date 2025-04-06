@@ -1,5 +1,5 @@
-import CategoryItem from '../components/CategoryItem';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { CategoryCheckboxItem } from '../components/CategoryItem';
 import { Category, getCategories } from '../data/categories';
 import {
   IonContent,
@@ -20,7 +20,10 @@ interface ViewCategoriesProps {
   setSelectedCategories: React.Dispatch<React.SetStateAction<Category[]>>;
 }
 
-const ViewCategories: React.FC<ViewCategoriesProps> = ({ selectedCategories, setSelectedCategories }) => {
+const ViewCategories: React.FC<ViewCategoriesProps> = ({
+  selectedCategories,
+  setSelectedCategories,
+}) => {
   const router = useIonRouter();
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -38,11 +41,11 @@ const ViewCategories: React.FC<ViewCategoriesProps> = ({ selectedCategories, set
 
   const onCategorySelect = (c: Category) => {
     if (selectedCategories.includes(c)) {
-      setSelectedCategories(prev => prev.filter(category => category !== c));
+      setSelectedCategories((prev) => prev.filter((category) => category !== c));
     } else {
-      setSelectedCategories(prev => [...prev, c]);
+      setSelectedCategories((prev) => [...prev, c]);
     }
-  }
+  };
 
   return (
     <IonPage id="categories-view">
@@ -55,19 +58,18 @@ const ViewCategories: React.FC<ViewCategoriesProps> = ({ selectedCategories, set
           Choose Your Inspiration
         </IonHeader>
 
-        <IonList className="categories-list">
-          {categories.map(c => <CategoryItem
-            key={c.name}
-            category={c}
-            selected={selectedCategories.includes(c)}
-            onSelect={() => onCategorySelect(c)}
-          />)}
+        <IonList className="category-list">
+          {categories.map((c) => (
+            <CategoryCheckboxItem
+              key={c.name}
+              category={c}
+              selected={selectedCategories.includes(c)}
+              onSelect={() => onCategorySelect(c)}
+            />
+          ))}
         </IonList>
 
-        <IonButton
-          className="save-button"
-          onClick={() => router.push('/reminders-view')}
-        >
+        <IonButton className="save-button" onClick={() => router.push('/reminders-view')}>
           Save
         </IonButton>
       </IonContent>

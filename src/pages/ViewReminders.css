@@ -24,19 +24,3 @@
   left: 50%;
   transform: translateX(-50%);
 }
-
-.add-reminder-options-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-}
-
-.category-selector {
-  display: flex;
-  flex-direction: row;
-  overflow: auto;
-  width: 100%;
-  height: 25px;
-  gap: 10px;
-}

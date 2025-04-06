@@ -1,4 +1,5 @@
-import { IonCard, IonCardContent } from '@ionic/react';
+import React from 'react';
+import { IonCheckbox, IonRadio } from '@ionic/react';
 import { Category } from '../data/categories';
 import './CategoryItem.css';
 
@@ -6,24 +7,41 @@ interface CategoryItemProps {
   category: Category;
   selected: boolean;
   onSelect: () => void;
-  children?: React.ReactNode;
   style?: React.CSSProperties;
 }
 
-const CategoryItem: React.FC<CategoryItemProps> = ({ category, selected, onSelect, children, style }) => {
+export const CategoryCheckboxItem: React.FC<CategoryItemProps> = ({
+  category,
+  selected,
+  onSelect,
+  style,
+}) => {
   return (
-    <IonCard
+    <IonCheckbox
       color={selected ? 'primary' : 'light'}
       onClick={onSelect}
       className="category-item"
       style={style}
     >
-      <IonCardContent className="category-item-content">
-        {category.name}
-      </IonCardContent>
-      {children}
-    </IonCard>
+      {category.name}
+    </IonCheckbox>
   );
 };
 
-export default CategoryItem;
+export const CategoryRadioItem: React.FC<CategoryItemProps> = ({
+  category,
+  selected,
+  onSelect,
+  style,
+}) => {
+  return (
+    <IonRadio
+      color={selected ? 'primary' : 'light'}
+      onClick={onSelect}
+      className="category-item"
+      style={style}
+    >
+      {category.name}
+    </IonRadio>
+  );
+};
