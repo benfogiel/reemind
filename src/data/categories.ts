@@ -17,7 +17,7 @@ const categories: Category[] = [
         category: 'Motivational',
       },
       {
-        quote: 'Believe you can and you\'re halfway there.',
+        quote: "Believe you can and you're halfway there.",
         category: 'Motivational',
       },
       {
@@ -28,7 +28,7 @@ const categories: Category[] = [
         quote: 'Do what you can, with what you have, where you are.',
         category: 'Motivational',
       },
-    ]
+    ],
   },
   {
     name: 'Funny',
@@ -41,10 +41,10 @@ const categories: Category[] = [
         quote: "I'm not a hoarder. I'm just saving things for the future.",
         category: 'Funny',
       },
-    ]
+    ],
   },
 ];
 
 export const getCategories = () => categories;
 
-export const getCategory = (name: string) => categories.find(c => c.name === name);
+export const getCategory = (name: string) => categories.find((c) => c.name === name);

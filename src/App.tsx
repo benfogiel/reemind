@@ -1,5 +1,5 @@
+import React, { useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import { useState } from "react";
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
@@ -40,9 +40,8 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => {
-  
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-  
+
   return (
     <IonApp>
       <IonReactRouter>
@@ -57,7 +56,7 @@ const App: React.FC = () => {
             />
           </Route>
           <Route path="/reminders-view" exact={true}>
-            <ViewReminders categories={selectedCategories}/>
+            <ViewReminders categories={selectedCategories} />
           </Route>
         </IonRouterOutlet>
       </IonReactRouter>
