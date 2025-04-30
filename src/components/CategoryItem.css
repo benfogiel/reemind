@@ -1,7 +1,17 @@
 /* CategoryItem.css */
 
 .category-item {
-  width: 75%;
+  height: 50px;
+  width: 100%;
   align-items: center;
   justify-content: center;
+}
+
+ion-checkbox {
+  --size: 20px;
+  --checkbox-background-checked: var(--ion-text-color);
+}
+
+ion-checkbox::part(container) {
+  border: 1.5px solid var(--ion-text-color);
 }

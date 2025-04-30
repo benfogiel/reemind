@@ -1,9 +1,11 @@
+import './ViewCategories.css';
+import '../theme/global.css';
+
 import React, { useState } from 'react';
 import { CategoryCheckboxItem } from '../components/CategoryItem';
 import { Category, getCategories } from '../data/categories';
 import {
   IonContent,
-  IonHeader,
   IonList,
   IonPage,
   IonRefresher,
@@ -11,9 +13,8 @@ import {
   useIonViewWillEnter,
   IonButton,
   useIonRouter,
+  IonItem,
 } from '@ionic/react';
-import './ViewCategories.css';
-import '../theme/global.css';
 
 interface ViewCategoriesProps {
   selectedCategories: Category[];
@@ -49,27 +50,31 @@ const ViewCategories: React.FC<ViewCategoriesProps> = ({
 
   return (
     <IonPage id="categories-view">
-      <IonContent fullscreen className="ion-padding content-container">
+      <IonContent fullscreen>
         <IonRefresher slot="fixed" onIonRefresh={refresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
 
-        <IonHeader translucent={true} className="page-header">
-          Choose Your Inspiration
-        </IonHeader>
+        <div className="page-header">Choose Your Inspiration</div>
 
-        <IonList className="category-list">
+        <IonList lines="inset">
           {categories.map((c) => (
-            <CategoryCheckboxItem
-              key={c.name}
-              category={c}
-              selected={selectedCategories.includes(c)}
-              onSelect={() => onCategorySelect(c)}
-            />
+            <IonItem key={c.name}>
+              <CategoryCheckboxItem
+                category={c}
+                selected={selectedCategories.includes(c)}
+                onSelect={() => onCategorySelect(c)}
+              />
+            </IonItem>
           ))}
         </IonList>
 
-        <IonButton className="save-button" onClick={() => router.push('/reminders-view')}>
+        <IonButton
+          className="save-button"
+          color="dark"
+          expand="block"
+          onClick={() => router.push('/reminders-view')}
+        >
           Save
         </IonButton>
       </IonContent>

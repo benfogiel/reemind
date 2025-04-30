@@ -1,19 +1,21 @@
 /* ViewCategories.css */
-.content-container {
-    display: flex;
-  }
-  
-  .category-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .save-button {
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
+
+#categories-view ion-content {
+  --background: var(--ion-overlay-background-color);
+}
+
+#categories-view ion-button {
+  --border-radius: 20px;
+}
+
+#categories-view .save-button {
+  position: fixed;
+  bottom: 10px;
+  left: 25px;
+  right: 25px;
+  width: calc(100% - 50px); /* Subtract the left and right margin */
+}
+
+#categories-view ion-item {
+  --background: var(--ion-overlay-background-color);
+}
