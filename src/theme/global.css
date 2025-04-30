@@ -1,6 +1,12 @@
+/* This is added to prevent the flashing that happens when toggling between palettes */
+ion-item {
+  --transition: none;
+}
+
 .page-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  height: 50px;
+}
