@@ -1,20 +1,23 @@
+import './ViewReminders.css';
+import '../theme/global.css';
+
 import React, { useState } from 'react';
 import {
   IonContent,
   IonPage,
   IonRefresher,
-  IonButton,
   IonRefresherContent,
   useIonViewWillEnter,
   useIonRouter,
+  IonIcon,
+  IonText,
 } from '@ionic/react';
-import './ViewReminders.css';
-import '../theme/global.css';
 
 import { Category } from '../data/categories';
 import { Reminder } from '../data/categories';
 import AddReminder from '../components/AddReminder';
 import { ReminderList } from '../components/ReminderList';
+import { settingsOutline } from 'ionicons/icons';
 
 interface ViewRemindersProps {
   categories: Category[];
@@ -23,6 +26,8 @@ interface ViewRemindersProps {
 const ViewReminders: React.FC<ViewRemindersProps> = ({ categories }) => {
   const router = useIonRouter();
 
+  // TODO: Get first name and past notified reminders from dynamic source
+  const FirstName = 'Benjamin';
   const [pastNotifiedReminders, setPastNotifiedReminders] = useState<Reminder[]>([
     {
       quote: 'The only way to do great work is to love what you do.',
@@ -62,24 +67,37 @@ const ViewReminders: React.FC<ViewRemindersProps> = ({ categories }) => {
 
   return (
     <IonPage id="reminders-view">
-      <IonContent fullscreen className="ion-padding content-container">
+      <IonContent fullscreen className="ion-padding">
         <IonRefresher slot="fixed" onIonRefresh={refresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
 
-        <IonButton
-          className="edit-categories-button"
-          onClick={() => router.push('/categories-view')}
-        >
-          Edit Categories
-        </IonButton>
+        <div className="page-header view-reminders-header">
+          <IonText>
+            <p style={{ fontSize: '10px', marginBottom: '0px', marginTop: '0px' }}>
+              Welcome Back!
+            </p>
+            <p style={{ fontSize: '25px', marginTop: '0px' }}>{FirstName}</p>
+          </IonText>
+          <IonIcon
+            icon={settingsOutline}
+            onClick={() => router.push('/categories-view')}
+            style={{ fontSize: '22px' }}
+          />
+        </div>
 
-        <AddReminder categories={categories} addReminder={addReminder} />
+        <div className="reminder-container">
+          <AddReminder categories={categories} addReminder={addReminder} />
 
-        <ReminderList
-          reminders={pastNotifiedReminders}
-          setReminders={setPastNotifiedReminders}
-        />
+          <IonText>
+            <h5>Past Reminders</h5>
+          </IonText>
+
+          <ReminderList
+            reminders={pastNotifiedReminders}
+            setReminders={setPastNotifiedReminders}
+          />
+        </div>
       </IonContent>
     </IonPage>
   );

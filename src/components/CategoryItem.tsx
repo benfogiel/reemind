@@ -1,7 +1,8 @@
+import './CategoryItem.css';
+
 import React from 'react';
 import { IonCheckbox, IonRadio } from '@ionic/react';
 import { Category } from '../data/categories';
-import './CategoryItem.css';
 
 interface CategoryItemProps {
   category: Category;
@@ -17,14 +18,15 @@ export const CategoryCheckboxItem: React.FC<CategoryItemProps> = ({
   style,
 }) => {
   return (
-    <IonCheckbox
-      color={selected ? 'primary' : 'light'}
-      onClick={onSelect}
-      className="category-item"
-      style={style}
-    >
-      {category.name}
-    </IonCheckbox>
+    <div className="category-item">
+      <IonCheckbox
+        color={selected ? 'primary' : 'light'}
+        onClick={onSelect}
+        style={style}
+      >
+        {category.name}
+      </IonCheckbox>
+    </div>
   );
 };
 

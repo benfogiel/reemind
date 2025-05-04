@@ -1,3 +1,5 @@
+import './ReminderList.css';
+
 import React, { useState } from 'react';
 import { IonList, IonItem, IonLabel, IonIcon, IonAlert } from '@ionic/react';
 import { close } from 'ionicons/icons';
@@ -23,7 +25,7 @@ export const ReminderList: React.FC<ReminderListProps> = ({
   };
 
   return (
-    <>
+    <div id="reminder-list-container">
       <IonList>
         {reminders.map((reminder) => (
           <IonItem key={reminder.quote}>
@@ -56,6 +58,6 @@ export const ReminderList: React.FC<ReminderListProps> = ({
           setOpenDeleteReminderAlert(false);
         }}
       ></IonAlert>
-    </>
+    </div>
   );
 };

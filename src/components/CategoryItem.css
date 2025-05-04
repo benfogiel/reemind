@@ -7,11 +7,12 @@
   justify-content: center;
 }
 
-ion-checkbox {
+.category-item ion-checkbox {
   --size: 20px;
   --checkbox-background-checked: var(--ion-text-color);
+  --checkbox-background: transparent;
 }
 
-ion-checkbox::part(container) {
+.category-item ion-checkbox::part(container) {
   border: 1.5px solid var(--ion-text-color);
 }

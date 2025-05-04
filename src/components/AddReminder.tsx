@@ -1,9 +1,20 @@
+import './AddReminder.css';
+
 import React, { useState, FC, useRef } from 'react';
-import { IonContent, IonItem, IonTextarea, IonIcon, IonModal } from '@ionic/react';
+import {
+  IonTextarea,
+  IonIcon,
+  IonModal,
+  IonButton,
+  IonList,
+  IonItem,
+  IonBadge,
+  IonToast,
+} from '@ionic/react';
 
 import { Category, Reminder } from '../data/categories';
-import { send } from 'ionicons/icons';
-import SelectCategory from './SelectCategory';
+import { list } from 'ionicons/icons';
+import { CategoryRadioItem } from './CategoryItem';
 
 interface AddReminderProps {
   categories: Category[];
@@ -13,44 +24,78 @@ interface AddReminderProps {
 export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) => {
   const selectCategoryModal = useRef<HTMLIonModalElement>(null);
 
-  const [reminder, setReminder] = useState<Reminder>({
-    quote: '',
-    category: '',
-  });
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [quote, setQuote] = useState<string>('');
+  const [showReminderAddedToast, setShowReminderAddedToast] = useState(false);
+
+  const onCategorySelect = (c: Category) => {
+    setSelectedCategory(c);
+    selectCategoryModal.current?.dismiss();
+  };
 
   const handleAddReminder = () => {
-    if (reminder.quote && reminder.category) {
-      addReminder(reminder);
-      setReminder({ quote: '', category: '' });
+    if (quote && selectedCategory) {
+      addReminder({ quote, category: selectedCategory.name });
+      setQuote('');
+      setSelectedCategory(null);
+      setShowReminderAddedToast(true);
+    } else if (quote && !selectedCategory) {
+      selectCategoryModal.current?.present();
     }
   };
 
   return (
-    <>
-      <IonContent>
-        <IonItem>
-          <IonTextarea
-            label="Add your reminder"
-            labelPlacement="floating"
-            value={reminder.quote}
-            onIonChange={(e) => setReminder({ ...reminder, quote: e.detail.value || '' })}
-          ></IonTextarea>
-        </IonItem>
+    <div id="add-reminder-container">
+      <div
+        id="add-reminder-header"
+        onClick={() => selectCategoryModal.current?.present()}
+      >
+        {selectedCategory ? (
+          <IonBadge color="primary">{selectedCategory.name}</IonBadge>
+        ) : (
+          <IonIcon icon={list} id="open-select-category-modal" />
+        )}
+      </div>
+      <IonTextarea
+        label="Add your reminder"
+        labelPlacement="floating"
+        value={quote}
+        onIonChange={(e) => setQuote(e.detail.value || '')}
+        autoGrow={true}
+        rows={4}
+      ></IonTextarea>
 
-        <IonIcon icon={send} id="open-select-category-modal" />
-      </IonContent>
-      <IonModal ref={selectCategoryModal} trigger="open-select-category-modal">
-        <SelectCategory
-          categories={categories}
-          onDismiss={() => selectCategoryModal.current?.dismiss()}
-          onConfirm={(category) => {
-            setReminder({ ...reminder, category: category.name });
-            selectCategoryModal.current?.dismiss();
-            handleAddReminder();
-          }}
-        />
+      <IonButton color="dark" size="small" onClick={handleAddReminder}>
+        Add
+      </IonButton>
+      <IonModal
+        ref={selectCategoryModal}
+        trigger="open-select-category-modal"
+        initialBreakpoint={1}
+        breakpoints={[0, 1]}
+      >
+        <div className="modal-content">
+          <IonList lines="inset">
+            {categories.map((c) => (
+              <IonItem key={c.name}>
+                <CategoryRadioItem
+                  category={c}
+                  selected={selectedCategory === c}
+                  onSelect={() => onCategorySelect(c)}
+                />
+              </IonItem>
+            ))}
+          </IonList>
+        </div>
       </IonModal>
-    </>
+      <IonToast
+        isOpen={showReminderAddedToast}
+        onDidDismiss={() => setShowReminderAddedToast(false)}
+        message="Reminder added!"
+        duration={1000}
+        position="top"
+      />
+    </div>
   );
 };
 

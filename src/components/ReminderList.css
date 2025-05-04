@@ -1,0 +1,14 @@
+/* ReminderList.css */
+#reminder-list-container ion-item {
+  --background: var(--ion-overlay-background-color);
+  --border-radius: 20px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  margin-bottom: 12px;
+  --border-style: none;
+  --inner-padding-end: 12px;
+}
+
+#reminder-list-container ion-list {
+  background: transparent;
+}
