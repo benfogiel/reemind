@@ -1,4 +1,4 @@
-import './ViewReminders.css';
+import './pages.css';
 import '../theme/global.css';
 
 import React, { useState } from 'react';

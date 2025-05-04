@@ -1,4 +1,4 @@
-import './ViewCategories.css';
+import './pages.css';
 import '../theme/global.css';
 
 import React, { useState } from 'react';
@@ -70,7 +70,7 @@ const ViewCategories: React.FC<ViewCategoriesProps> = ({
         </IonList>
 
         <IonButton
-          className="save-button"
+          className="bottom-button"
           color="dark"
           expand="block"
           onClick={() => router.push('/reminders-view')}
