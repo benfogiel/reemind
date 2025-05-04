@@ -9,6 +9,11 @@ import ViewReminders from './pages/ViewReminders';
 import ViewWelcome from './pages/ViewWelcome';
 import { getReminders, setReminders } from './services/preferences';
 import { getDefaultReminders } from './data/reminders';
+import {
+  requestNotificationPermissions,
+  scheduleDailyReminder,
+} from './services/notifications';
+import { setupNotificationListener } from './services/notifications';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -53,6 +58,18 @@ const App: React.FC = () => {
     };
 
     loadReminders();
+  }, []);
+
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      const hasPermission = await requestNotificationPermissions();
+      if (!hasPermission) return;
+
+      setupNotificationListener();
+      await scheduleDailyReminder();
+    };
+
+    initializeNotifications();
   }, []);
 
   return (

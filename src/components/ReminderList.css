@@ -12,3 +12,8 @@
 #reminder-list-container ion-list {
   background: transparent;
 }
+
+.text-center {
+  width: 100%;
+  text-align: center;
+}

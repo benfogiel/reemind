@@ -22,6 +22,7 @@ import {
   deleteReminder,
   getFirstName,
   getUserSelectedCategories,
+  getPastReminders,
 } from '../services/preferences';
 
 const ViewReminders: React.FC = () => {
@@ -29,26 +30,7 @@ const ViewReminders: React.FC = () => {
 
   const [categories, setCategories] = useState<string[]>([]);
   const [firstName, setFirstName] = useState<string>('');
-
-  // TODO: Get first name and past notified reminders from dynamic source
-  const [pastNotifiedReminders, setPastNotifiedReminders] = useState<Reminder[]>([
-    {
-      quote: 'The only way to do great work is to love what you do.',
-      category: 'Motivational',
-    },
-    {
-      quote: "Believe you can and you're halfway there.",
-      category: 'Motivational',
-    },
-    {
-      quote: 'The future belongs to those who believe in the beauty of their dreams.',
-      category: 'Motivational',
-    },
-    {
-      quote: 'Do what you can, with what you have, where you are.',
-      category: 'Motivational',
-    },
-  ]);
+  const [pastReminders, setPastReminders] = useState<Reminder[]>([]);
 
   useIonViewWillEnter(() => {
     const loadSelectedCategories = async () => {
@@ -58,12 +40,17 @@ const ViewReminders: React.FC = () => {
 
     const loadFirstName = async () => {
       const firstName = await getFirstName();
-      console.log('firstName', firstName);
       setFirstName(firstName);
+    };
+
+    const loadPastReminders = async () => {
+      const pastReminders = await getPastReminders();
+      setPastReminders(pastReminders);
     };
 
     loadSelectedCategories();
     loadFirstName();
+    loadPastReminders();
   });
 
   const refresh = (e: CustomEvent) => {
@@ -106,10 +93,7 @@ const ViewReminders: React.FC = () => {
             <h5>Past Reminders</h5>
           </IonText>
 
-          <ReminderList
-            reminders={pastNotifiedReminders}
-            deleteReminder={deleteReminder}
-          />
+          <ReminderList reminders={pastReminders} deleteReminder={deleteReminder} />
         </div>
       </IonContent>
     </IonPage>

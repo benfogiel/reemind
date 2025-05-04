@@ -1,7 +1,7 @@
 import './ReminderList.css';
 
 import React, { useState } from 'react';
-import { IonList, IonItem, IonLabel, IonIcon, IonAlert } from '@ionic/react';
+import { IonList, IonItem, IonLabel, IonIcon, IonAlert, IonText } from '@ionic/react';
 import { close } from 'ionicons/icons';
 
 import { Reminder } from '../data/reminders';
@@ -26,20 +26,26 @@ export const ReminderList: React.FC<ReminderListProps> = ({
 
   return (
     <div id="reminder-list-container">
-      <IonList>
-        {reminders.map((reminder) => (
-          <IonItem key={reminder.quote}>
-            <IonLabel>{reminder.quote}</IonLabel>
-            <IonIcon
-              icon={close}
-              onClick={() => {
-                setReminderToDelete(reminder);
-                setOpenDeleteReminderAlert(true);
-              }}
-            />
-          </IonItem>
-        ))}
-      </IonList>
+      {reminders.length > 0 ? (
+        <IonList>
+          {reminders.map((reminder) => (
+            <IonItem key={reminder.quote}>
+              <IonLabel>{reminder.quote}</IonLabel>
+              <IonIcon
+                icon={close}
+                onClick={() => {
+                  setReminderToDelete(reminder);
+                  setOpenDeleteReminderAlert(true);
+                }}
+              />
+            </IonItem>
+          ))}
+        </IonList>
+      ) : (
+        <IonText className="text-center">
+          <p>No reminders yet</p>
+        </IonText>
+      )}
 
       <IonAlert
         header="Are you sure?"
