@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -7,7 +7,7 @@ import ViewCategories from './pages/ViewCategories';
 import ViewReminders from './pages/ViewReminders';
 
 import ViewWelcome from './pages/ViewWelcome';
-import { getReminders, setReminders } from './services/preferences';
+import { getFirstName, getReminders, setReminders } from './services/preferences';
 import { getDefaultReminders } from './data/reminders';
 import {
   requestNotificationPermissions,
@@ -48,6 +48,8 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => {
+  const [firstName, setFirstName] = useState<string>('');
+
   useEffect(() => {
     const loadReminders = async () => {
       const reminders = await getReminders();
@@ -57,7 +59,13 @@ const App: React.FC = () => {
       }
     };
 
+    const loadFirstName = async () => {
+      const firstName = await getFirstName();
+      setFirstName(firstName);
+    };
+
     loadReminders();
+    loadFirstName();
   }, []);
 
   useEffect(() => {
@@ -77,7 +85,11 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonRouterOutlet>
           <Route path="/" exact={true}>
-            <Redirect to="/welcome-view" />
+            {firstName ? (
+              <Redirect to="/reminders-view" />
+            ) : (
+              <Redirect to="/welcome-view" />
+            )}
           </Route>
           <Route path="/welcome-view" exact={true}>
             <ViewWelcome />
