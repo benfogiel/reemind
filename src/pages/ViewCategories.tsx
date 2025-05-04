@@ -2,8 +2,6 @@ import './pages.css';
 import '../theme/global.css';
 
 import React, { useState } from 'react';
-import { CategoryCheckboxItem } from '../components/CategoryItem';
-import { Category, getCategories } from '../data/categories';
 import {
   IonContent,
   IonList,
@@ -16,22 +14,32 @@ import {
   IonItem,
 } from '@ionic/react';
 
-interface ViewCategoriesProps {
-  selectedCategories: Category[];
-  setSelectedCategories: React.Dispatch<React.SetStateAction<Category[]>>;
-}
+import { CategoryCheckboxItem } from '../components/CategoryItem';
+import {
+  getCategories,
+  getUserSelectedCategories,
+  setUserSelectedCategories,
+} from '../services/preferences';
 
-const ViewCategories: React.FC<ViewCategoriesProps> = ({
-  selectedCategories,
-  setSelectedCategories,
-}) => {
+const ViewCategories: React.FC = () => {
   const router = useIonRouter();
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useIonViewWillEnter(() => {
-    const categories = getCategories();
-    setCategories(categories);
+    const loadUserSelectedCategories = async () => {
+      const userSelectedCategories = await getUserSelectedCategories();
+      setSelectedCategories(userSelectedCategories);
+    };
+
+    const loadCategories = async () => {
+      const categories = await getCategories();
+      setCategories(categories);
+    };
+
+    loadUserSelectedCategories();
+    loadCategories();
   });
 
   const refresh = (e: CustomEvent) => {
@@ -40,12 +48,17 @@ const ViewCategories: React.FC<ViewCategoriesProps> = ({
     }, 3000);
   };
 
-  const onCategorySelect = (c: Category) => {
+  const onCategorySelect = (c: string) => {
     if (selectedCategories.includes(c)) {
       setSelectedCategories((prev) => prev.filter((category) => category !== c));
     } else {
       setSelectedCategories((prev) => [...prev, c]);
     }
+  };
+
+  const onSave = () => {
+    setUserSelectedCategories(selectedCategories);
+    router.push('/reminders-view');
   };
 
   return (
@@ -59,7 +72,7 @@ const ViewCategories: React.FC<ViewCategoriesProps> = ({
 
         <IonList lines="inset">
           {categories.map((c) => (
-            <IonItem key={c.name}>
+            <IonItem key={c}>
               <CategoryCheckboxItem
                 category={c}
                 selected={selectedCategories.includes(c)}
@@ -69,12 +82,7 @@ const ViewCategories: React.FC<ViewCategoriesProps> = ({
           ))}
         </IonList>
 
-        <IonButton
-          className="bottom-button"
-          color="dark"
-          expand="block"
-          onClick={() => router.push('/reminders-view')}
-        >
+        <IonButton className="bottom-button" color="dark" expand="block" onClick={onSave}>
           Save
         </IonButton>
       </IonContent>

@@ -13,21 +13,24 @@ import {
   IonText,
 } from '@ionic/react';
 
-import { Category } from '../data/categories';
-import { Reminder } from '../data/categories';
+import { Reminder } from '../data/reminders';
 import AddReminder from '../components/AddReminder';
 import { ReminderList } from '../components/ReminderList';
 import { settingsOutline } from 'ionicons/icons';
+import {
+  addReminder,
+  deleteReminder,
+  getFirstName,
+  getUserSelectedCategories,
+} from '../services/preferences';
 
-interface ViewRemindersProps {
-  categories: Category[];
-}
-
-const ViewReminders: React.FC<ViewRemindersProps> = ({ categories }) => {
+const ViewReminders: React.FC = () => {
   const router = useIonRouter();
 
+  const [categories, setCategories] = useState<string[]>([]);
+  const [firstName, setFirstName] = useState<string>('');
+
   // TODO: Get first name and past notified reminders from dynamic source
-  const FirstName = 'Benjamin';
   const [pastNotifiedReminders, setPastNotifiedReminders] = useState<Reminder[]>([
     {
       quote: 'The only way to do great work is to love what you do.',
@@ -47,7 +50,21 @@ const ViewReminders: React.FC<ViewRemindersProps> = ({ categories }) => {
     },
   ]);
 
-  useIonViewWillEnter(() => {});
+  useIonViewWillEnter(() => {
+    const loadSelectedCategories = async () => {
+      const selectedCategories = await getUserSelectedCategories();
+      setCategories(selectedCategories);
+    };
+
+    const loadFirstName = async () => {
+      const firstName = await getFirstName();
+      console.log('firstName', firstName);
+      setFirstName(firstName);
+    };
+
+    loadSelectedCategories();
+    loadFirstName();
+  });
 
   const refresh = (e: CustomEvent) => {
     setTimeout(() => {
@@ -55,14 +72,10 @@ const ViewReminders: React.FC<ViewRemindersProps> = ({ categories }) => {
     }, 3000);
   };
 
-  const addReminder = (reminder: Reminder) => {
+  const handleAddReminder = (reminder: Reminder) => {
     if (reminder.quote && reminder.category) {
-      // TODO: Add reminder to database
+      addReminder(reminder);
     }
-  };
-
-  const deleteReminder = (reminder: Reminder) => {
-    // TODO: Delete reminder from database
   };
 
   return (
@@ -77,7 +90,7 @@ const ViewReminders: React.FC<ViewRemindersProps> = ({ categories }) => {
             <p style={{ fontSize: '10px', marginBottom: '0px', marginTop: '0px' }}>
               Welcome Back!
             </p>
-            <p style={{ fontSize: '25px', marginTop: '0px' }}>{FirstName}</p>
+            <p style={{ fontSize: '25px', marginTop: '0px' }}>{firstName}</p>
           </IonText>
           <IonIcon
             icon={settingsOutline}
@@ -87,7 +100,7 @@ const ViewReminders: React.FC<ViewRemindersProps> = ({ categories }) => {
         </div>
 
         <div className="reminder-container">
-          <AddReminder categories={categories} addReminder={addReminder} />
+          <AddReminder categories={categories} addReminder={handleAddReminder} />
 
           <IonText>
             <h5>Past Reminders</h5>
@@ -95,7 +108,7 @@ const ViewReminders: React.FC<ViewRemindersProps> = ({ categories }) => {
 
           <ReminderList
             reminders={pastNotifiedReminders}
-            setReminders={setPastNotifiedReminders}
+            deleteReminder={deleteReminder}
           />
         </div>
       </IonContent>

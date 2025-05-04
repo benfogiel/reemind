@@ -4,23 +4,23 @@ import React, { useState } from 'react';
 import { IonList, IonItem, IonLabel, IonIcon, IonAlert } from '@ionic/react';
 import { close } from 'ionicons/icons';
 
-import { Reminder } from '../data/categories';
+import { Reminder } from '../data/reminders';
 
 interface ReminderListProps {
   reminders: Reminder[];
-  setReminders: (reminders: Reminder[]) => void;
+  deleteReminder: (reminder: Reminder) => void;
 }
 
 export const ReminderList: React.FC<ReminderListProps> = ({
   reminders,
-  setReminders,
+  deleteReminder,
 }) => {
   const [reminderToDelete, setReminderToDelete] = useState<Reminder | null>(null);
   const [openDeleteReminderAlert, setOpenDeleteReminderAlert] = useState(false);
 
   const handleDeleteReminder = () => {
     if (reminderToDelete) {
-      setReminders(reminders.filter((r) => r !== reminderToDelete));
+      deleteReminder(reminderToDelete);
     }
   };
 

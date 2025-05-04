@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
 import ViewCategories from './pages/ViewCategories';
 import ViewReminders from './pages/ViewReminders';
-import { Category } from './data/categories';
+
+import ViewWelcome from './pages/ViewWelcome';
+import { getReminders, setReminders } from './services/preferences';
+import { getDefaultReminders } from './data/reminders';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -36,12 +39,21 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import ViewWelcome from './pages/ViewWelcome';
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  useEffect(() => {
+    const loadReminders = async () => {
+      const reminders = await getReminders();
+      if (reminders.length === 0) {
+        const defaultReminders = getDefaultReminders();
+        await setReminders(defaultReminders);
+      }
+    };
+
+    loadReminders();
+  }, []);
 
   return (
     <IonApp>
@@ -54,13 +66,10 @@ const App: React.FC = () => {
             <ViewWelcome />
           </Route>
           <Route path="/categories-view" exact={true}>
-            <ViewCategories
-              selectedCategories={selectedCategories}
-              setSelectedCategories={setSelectedCategories}
-            />
+            <ViewCategories />
           </Route>
           <Route path="/reminders-view" exact={true}>
-            <ViewReminders categories={selectedCategories} />
+            <ViewReminders />
           </Route>
         </IonRouterOutlet>
       </IonReactRouter>

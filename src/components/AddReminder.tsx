@@ -12,32 +12,32 @@ import {
   IonToast,
 } from '@ionic/react';
 
-import { Category, Reminder } from '../data/categories';
+import { Reminder } from '../data/reminders';
 import { list } from 'ionicons/icons';
 import { CategoryRadioItem } from './CategoryItem';
 
 interface AddReminderProps {
-  categories: Category[];
+  categories: string[];
   addReminder: (reminder: Reminder) => void;
 }
 
 export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) => {
   const selectCategoryModal = useRef<HTMLIonModalElement>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [quote, setQuote] = useState<string>('');
   const [showReminderAddedToast, setShowReminderAddedToast] = useState(false);
 
-  const onCategorySelect = (c: Category) => {
+  const onCategorySelect = (c: string) => {
     setSelectedCategory(c);
     selectCategoryModal.current?.dismiss();
   };
 
   const handleAddReminder = () => {
     if (quote && selectedCategory) {
-      addReminder({ quote, category: selectedCategory.name });
+      addReminder({ quote, category: selectedCategory });
       setQuote('');
-      setSelectedCategory(null);
+      setSelectedCategory('');
       setShowReminderAddedToast(true);
     } else if (quote && !selectedCategory) {
       selectCategoryModal.current?.present();
@@ -51,7 +51,7 @@ export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) =
         onClick={() => selectCategoryModal.current?.present()}
       >
         {selectedCategory ? (
-          <IonBadge color="primary">{selectedCategory.name}</IonBadge>
+          <IonBadge color="primary">{selectedCategory}</IonBadge>
         ) : (
           <IonIcon icon={list} id="open-select-category-modal" />
         )}
@@ -77,7 +77,7 @@ export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) =
         <div className="modal-content">
           <IonList lines="inset">
             {categories.map((c) => (
-              <IonItem key={c.name}>
+              <IonItem key={c}>
                 <CategoryRadioItem
                   category={c}
                   selected={selectedCategory === c}

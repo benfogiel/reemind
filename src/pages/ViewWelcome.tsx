@@ -11,10 +11,19 @@ import {
   IonText,
 } from '@ionic/react';
 
+import { setFirstName } from '../services/preferences';
+
 const ViewWelcome: React.FC = () => {
   const router = useIonRouter();
 
-  const [firstName, setFirstName] = useState<string>('');
+  const [inputtedFirstName, setInputtedFirstName] = useState<string>('');
+
+  const onContinue = () => {
+    if (inputtedFirstName.length > 0) {
+      setFirstName(inputtedFirstName);
+      router.push('/categories-view');
+    }
+  };
 
   return (
     <IonPage id="welcome-view">
@@ -27,8 +36,8 @@ const ViewWelcome: React.FC = () => {
           </IonText>
           <IonInput
             placeholder="first name"
-            value={firstName}
-            onIonChange={(e: CustomEvent) => setFirstName(e.detail.value)}
+            value={inputtedFirstName}
+            onIonChange={(e: CustomEvent) => setInputtedFirstName(e.detail.value)}
           />
         </div>
 
@@ -36,7 +45,7 @@ const ViewWelcome: React.FC = () => {
           className="bottom-button"
           color="dark"
           expand="block"
-          onClick={() => router.push('/categories-view')}
+          onClick={onContinue}
         >
           Continue
         </IonButton>

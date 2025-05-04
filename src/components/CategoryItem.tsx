@@ -2,10 +2,9 @@ import './CategoryItem.css';
 
 import React from 'react';
 import { IonCheckbox, IonRadio } from '@ionic/react';
-import { Category } from '../data/categories';
 
 interface CategoryItemProps {
-  category: Category;
+  category: string;
   selected: boolean;
   onSelect: () => void;
   style?: React.CSSProperties;
@@ -20,11 +19,12 @@ export const CategoryCheckboxItem: React.FC<CategoryItemProps> = ({
   return (
     <div className="category-item">
       <IonCheckbox
+        checked={selected}
         color={selected ? 'primary' : 'light'}
         onClick={onSelect}
         style={style}
       >
-        {category.name}
+        {category}
       </IonCheckbox>
     </div>
   );
@@ -43,7 +43,7 @@ export const CategoryRadioItem: React.FC<CategoryItemProps> = ({
       className="category-item"
       style={style}
     >
-      {category.name}
+      {category}
     </IonRadio>
   );
 };
