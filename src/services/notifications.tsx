@@ -4,6 +4,7 @@ import {
   getUserSelectedCategories,
   addPastReminder,
   getReminderById,
+  getPastReminders,
 } from './preferences';
 
 export const requestNotificationPermissions = async () => {
@@ -38,8 +39,11 @@ const getRandomTime = () => {
 const getRandomReminder = async () => {
   let reminders = await getReminders();
   const userSelectedCategories = await getUserSelectedCategories();
-  reminders = reminders.filter((reminder) =>
-    userSelectedCategories.includes(reminder.category)
+  const pastReminders = await getPastReminders();
+  reminders = reminders.filter(
+    (reminder) =>
+      userSelectedCategories.includes(reminder.category) &&
+      !pastReminders.some((pastReminder) => pastReminder.id === reminder.id)
   );
   if (reminders.length === 0) return null;
   const randomIndex = Math.floor(Math.random() * reminders.length);
