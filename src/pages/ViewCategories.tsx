@@ -88,7 +88,13 @@ const ViewCategories: React.FC = () => {
       </IonContent>
 
       <IonFooter>
-        <IonButton className="bottom-button" color="dark" expand="block" onClick={onSave}>
+        <IonButton
+          className="bottom-button"
+          color="dark"
+          expand="block"
+          onClick={onSave}
+          disabled={selectedCategories.length === 0}
+        >
           Save
         </IonButton>
       </IonFooter>
