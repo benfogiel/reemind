@@ -59,12 +59,6 @@ const ViewReminders: React.FC = () => {
     }, 3000);
   };
 
-  const handleAddReminder = (reminder: Reminder) => {
-    if (reminder.quote && reminder.category) {
-      addReminder(reminder);
-    }
-  };
-
   return (
     <IonPage id="reminders-view">
       <IonContent fullscreen className="ion-padding">
@@ -87,7 +81,7 @@ const ViewReminders: React.FC = () => {
         </div>
 
         <div className="reminder-container">
-          <AddReminder categories={categories} addReminder={handleAddReminder} />
+          <AddReminder categories={categories} addReminder={addReminder} />
 
           <IonText>
             <h5>Past Reminders</h5>

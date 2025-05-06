@@ -1,5 +1,10 @@
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { getReminders, getUserSelectedCategories } from './preferences';
+import {
+  getReminders,
+  getUserSelectedCategories,
+  addPastReminder,
+  getReminderById,
+} from './preferences';
 
 export const requestNotificationPermissions = async () => {
   const { display } = await LocalNotifications.requestPermissions();
@@ -53,7 +58,7 @@ export const scheduleDailyReminder = async () => {
   await LocalNotifications.schedule({
     notifications: [
       {
-        title: 'Daily Reminder',
+        title: 'Reemind',
         body: reminder.quote,
         id: Math.floor(Math.random() * 1000000), // Unique ID
         schedule: {
@@ -63,6 +68,9 @@ export const scheduleDailyReminder = async () => {
         sound: undefined,
         attachments: undefined,
         actionTypeId: '',
+        extra: {
+          reminderId: reminder.id,
+        },
       },
     ],
   });
@@ -73,8 +81,20 @@ export const scheduleDailyReminder = async () => {
 };
 
 export const setupNotificationListener = () => {
-  LocalNotifications.addListener('localNotificationActionPerformed', async () => {
-    // Reschedule for the next day
-    await scheduleDailyReminder();
-  });
+  LocalNotifications.addListener(
+    'localNotificationActionPerformed',
+    async (notification) => {
+      const extra = notification.notification.extra;
+
+      if (extra?.reminderId) {
+        const reminder = await getReminderById(extra.reminderId);
+        if (reminder) {
+          await addPastReminder(reminder);
+        }
+      }
+
+      // Reschedule for the next day
+      await scheduleDailyReminder();
+    }
+  );
 };

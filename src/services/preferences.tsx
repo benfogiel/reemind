@@ -25,6 +25,11 @@ export const getReminders = async (): Promise<Reminder[]> => {
   return JSON.parse(value || '[]');
 };
 
+export const getReminderById = async (id: string): Promise<Reminder | undefined> => {
+  const reminders = await getReminders();
+  return reminders.find((r: Reminder) => r.id === id);
+};
+
 export const addReminder = async (reminder: Reminder) => {
   const reminders = await getReminders();
   reminders.push(reminder);

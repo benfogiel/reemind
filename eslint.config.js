@@ -6,6 +6,9 @@ import pluginReact from 'eslint-plugin-react';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default defineConfig([
+  {
+    ignores: ['ios/**', 'dist/**'],
+  },
   { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],

@@ -11,6 +11,7 @@ import {
   IonBadge,
   IonToast,
 } from '@ionic/react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Reminder } from '../data/reminders';
 import { list } from 'ionicons/icons';
@@ -35,7 +36,7 @@ export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) =
 
   const handleAddReminder = () => {
     if (quote && selectedCategory) {
-      addReminder({ quote, category: selectedCategory });
+      addReminder({ id: uuidv4(), quote, category: selectedCategory });
       setQuote('');
       setSelectedCategory('');
       setShowReminderAddedToast(true);

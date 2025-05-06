@@ -1,4 +1,5 @@
 export interface Reminder {
+  id: string;
   quote: string;
   category: string;
 }
