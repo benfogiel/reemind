@@ -28,6 +28,7 @@ export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) =
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [quote, setQuote] = useState<string>('');
   const [showReminderAddedToast, setShowReminderAddedToast] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const onCategorySelect = (c: string) => {
     setSelectedCategory(c);
@@ -41,7 +42,7 @@ export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) =
       setSelectedCategory('');
       setShowReminderAddedToast(true);
     } else if (quote && !selectedCategory) {
-      selectCategoryModal.current?.present();
+      setModalOpen(true);
     }
   };
 
@@ -54,7 +55,7 @@ export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) =
         {selectedCategory ? (
           <IonBadge color="primary">{selectedCategory}</IonBadge>
         ) : (
-          <IonIcon icon={list} id="open-select-category-modal" />
+          <IonIcon icon={list} />
         )}
       </div>
       <IonTextarea
@@ -71,7 +72,8 @@ export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) =
       </IonButton>
       <IonModal
         ref={selectCategoryModal}
-        trigger="open-select-category-modal"
+        isOpen={modalOpen}
+        onDidDismiss={() => setModalOpen(false)}
         initialBreakpoint={1}
         breakpoints={[0, 1]}
       >
