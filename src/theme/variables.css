@@ -4,6 +4,7 @@ http://ionicframework.com/docs/theming/ */
 @media (prefers-color-scheme: dark) {
   :root.ios,
   :root.md {
+    --ion-overlay-background-color: #3a3a3a;
   }
 }
 
