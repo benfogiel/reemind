@@ -12,6 +12,8 @@ import {
   IonButton,
   useIonRouter,
   IonItem,
+  IonHeader,
+  IonFooter,
 } from '@ionic/react';
 
 import { CategoryCheckboxItem } from '../components/CategoryItem';
@@ -63,12 +65,14 @@ const ViewCategories: React.FC = () => {
 
   return (
     <IonPage id="categories-view">
+      <IonHeader>
+        <div className="page-header">Choose Your Inspiration</div>
+      </IonHeader>
+
       <IonContent fullscreen>
         <IonRefresher slot="fixed" onIonRefresh={refresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-
-        <div className="page-header">Choose Your Inspiration</div>
 
         <IonList lines="inset">
           {categories.map((c) => (
@@ -81,11 +85,13 @@ const ViewCategories: React.FC = () => {
             </IonItem>
           ))}
         </IonList>
+      </IonContent>
 
+      <IonFooter>
         <IonButton className="bottom-button" color="dark" expand="block" onClick={onSave}>
           Save
         </IonButton>
-      </IonContent>
+      </IonFooter>
     </IonPage>
   );
 };

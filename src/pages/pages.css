@@ -6,6 +6,13 @@
   width: calc(100% - 50px); /* Subtract the left and right margin */
 }
 
+.page-header {
+  padding: env(safe-area-inset-top) 16px 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 /* ViewReminders */
 
 #reminders-view ion-content {
@@ -15,6 +22,7 @@
 #reminders-view .view-reminders-header {
   justify-content: space-between;
   align-items: flex-start;
+  padding-bottom: 30px;
 }
 
 #reminders-view .reminder-container {
@@ -47,11 +55,11 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  padding-bottom: 20vh;
 }
 
 #welcome-view ion-input {
   --background: var(--ion-overlay-background-color);
   --border-radius: 20px;
   max-width: 80%;
-  margin-top: 10px;
 }

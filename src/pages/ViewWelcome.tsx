@@ -5,10 +5,12 @@ import React, { useState } from 'react';
 import {
   IonContent,
   IonPage,
+  IonHeader,
   IonButton,
   useIonRouter,
   IonInput,
   IonText,
+  IonFooter,
 } from '@ionic/react';
 
 import { setFirstName } from '../services/preferences';
@@ -27,9 +29,11 @@ const ViewWelcome: React.FC = () => {
 
   return (
     <IonPage id="welcome-view">
-      <IonContent fullscreen>
+      <IonHeader>
         <div className="page-header">Welcome!</div>
+      </IonHeader>
 
+      <IonContent fullscreen scrollY={false}>
         <div className="name-input-container">
           <IonText>
             <p>Enter your first name</p>
@@ -40,7 +44,9 @@ const ViewWelcome: React.FC = () => {
             onIonChange={(e: CustomEvent) => setInputtedFirstName(e.detail.value)}
           />
         </div>
+      </IonContent>
 
+      <IonFooter>
         <IonButton
           className="bottom-button"
           color="dark"
@@ -49,7 +55,7 @@ const ViewWelcome: React.FC = () => {
         >
           Continue
         </IonButton>
-      </IonContent>
+      </IonFooter>
     </IonPage>
   );
 };

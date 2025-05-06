@@ -11,6 +11,7 @@ import {
   useIonRouter,
   IonIcon,
   IonText,
+  IonHeader,
 } from '@ionic/react';
 
 import { Reminder } from '../data/reminders';
@@ -61,11 +62,7 @@ const ViewReminders: React.FC = () => {
 
   return (
     <IonPage id="reminders-view">
-      <IonContent fullscreen className="ion-padding">
-        <IonRefresher slot="fixed" onIonRefresh={refresh}>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
-
+      <IonHeader>
         <div className="page-header view-reminders-header">
           <IonText>
             <p style={{ fontSize: '10px', marginBottom: '0px', marginTop: '0px' }}>
@@ -79,6 +76,12 @@ const ViewReminders: React.FC = () => {
             style={{ fontSize: '22px' }}
           />
         </div>
+      </IonHeader>
+
+      <IonContent fullscreen className="ion-padding">
+        <IonRefresher slot="fixed" onIonRefresh={refresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
 
         <div className="reminder-container">
           <AddReminder categories={categories} addReminder={addReminder} />
