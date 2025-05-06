@@ -49,6 +49,7 @@ setupIonicReact();
 
 const App: React.FC = () => {
   const [firstName, setFirstName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadReminders = async () => {
@@ -62,6 +63,7 @@ const App: React.FC = () => {
     const loadFirstName = async () => {
       const firstName = await getFirstName();
       setFirstName(firstName);
+      setIsLoading(false);
     };
 
     loadReminders();
@@ -85,7 +87,7 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonRouterOutlet>
           <Route path="/" exact={true}>
-            {firstName ? (
+            {isLoading ? null : firstName ? (
               <Redirect to="/reminders-view" />
             ) : (
               <Redirect to="/welcome-view" />
