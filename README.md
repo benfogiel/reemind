@@ -6,19 +6,19 @@
 
 ```
 npm run build
-npx cap sync
+ionic cap sync
 ```
 
 if you haven't added the ios platform yet, run:
 
 ```
-npx cap add ios
+ionic cap add ios
 ```
 
 then open the iOS project in Xcode:
 
 ```
-npx cap open ios
+ionic cap open ios
 ```
 
 NOTE: Apple mandates that app developers now specify approved reasons for API usage to enhance user privacy. PrivacyInfo.xcprivacy file must be added to /ios/App with the following:
