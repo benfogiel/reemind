@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export interface Reminder {
   id: string;
   quote: string;
@@ -25,7 +27,7 @@ export const getDefaultReminders = (): Reminder[] => {
   const reminders: Reminder[] = [];
   for (const [category, quotes] of Object.entries(defaultReminders)) {
     for (const quote of quotes) {
-      reminders.push({ quote, category });
+      reminders.push({ id: uuidv4(), quote, category });
     }
   }
   return reminders;
