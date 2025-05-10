@@ -72,11 +72,8 @@ const ViewReminders: React.FC = () => {
     await rescheduleReminders();
   };
 
-  useEffect(() => {
-    setupNotifications();
-  }, []);
-
   useIonViewWillEnter(() => {
+    setupNotifications();
     loadSelectedCategories();
     loadFirstName();
     loadRecentReminders();
