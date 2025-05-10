@@ -62,7 +62,7 @@ export const AddReminder: FC<AddReminderProps> = ({ categories, addReminder }) =
         label="Add your reminder"
         labelPlacement="floating"
         value={quote}
-        onIonChange={(e) => setQuote(e.detail.value || '')}
+        onIonInput={(e) => setQuote(e.detail.value || '')}
         autoGrow={true}
         rows={4}
       ></IonTextarea>

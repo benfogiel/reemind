@@ -41,12 +41,12 @@ const ViewWelcome: React.FC = () => {
           <IonInput
             placeholder="first name"
             value={inputtedFirstName}
-            onIonChange={(e: CustomEvent) => setInputtedFirstName(e.detail.value)}
+            onIonInput={(e: CustomEvent) => setInputtedFirstName(e.detail.value)}
           />
         </div>
       </IonContent>
 
-      <IonFooter>
+      <IonFooter className="page-footer">
         <IonButton
           className="bottom-button"
           color="dark"
