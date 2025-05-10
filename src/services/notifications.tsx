@@ -2,10 +2,18 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import {
   getReminders,
   getUserSelectedCategories,
-  addPastReminder,
-  getReminderById,
-  getPastReminders,
+  getRecentReminders,
+  setScheduledReminders,
+  getScheduledReminders,
+  addRecentReminder,
 } from './preferences';
+import { Reminder } from '../data/reminders';
+
+export interface ScheduledReminder {
+  notificationId: number;
+  reminder: Reminder;
+  date: Date;
+}
 
 export const requestNotificationPermissions = async () => {
   const { display } = await LocalNotifications.requestPermissions();
@@ -16,58 +24,83 @@ export const requestNotificationPermissions = async () => {
   return true;
 };
 
-// Generate random time between 8 AM and 5 PM
-const getRandomTime = () => {
+export const rescheduleReminders = async (quantity: number = 30) => {
   const now = new Date();
-  const startHour = parseInt(process.env.REACT_APP_NOTIFICATION_START_HOUR || '8');
-  const endHour = parseInt(process.env.REACT_APP_NOTIFICATION_END_HOUR || '17');
-  const randomHour = Math.floor(Math.random() * (endHour - startHour)) + startHour;
-  const randomMinute = Math.floor(Math.random() * 60);
+  const startDate = now;
 
-  const randomTime = new Date(now);
-  randomTime.setHours(randomHour, randomMinute, 0, 0);
-
-  // If the time is in the past, schedule for tomorrow
-  if (randomTime < now) {
-    randomTime.setDate(now.getDate() + 1);
+  // Get previously scheduled reminders that have already been sent
+  // and add to the past reminders list
+  const previouslyScheduledReminders = await getScheduledReminders();
+  for (const scheduledReminder of previouslyScheduledReminders) {
+    if (scheduledReminder.date < now) {
+      addRecentReminder(scheduledReminder.reminder);
+    }
+    // if a reminder has already been sent today, start scheduling tomorrow
+    if (
+      getDaysSinceEpoch(scheduledReminder.date) === getDaysSinceEpoch(now) &&
+      scheduledReminder.date < now
+    ) {
+      startDate.setDate(startDate.getDate() + 1);
+    }
   }
 
-  return randomTime;
+  // Replace all scheduled reminders with new ones
+  await cancelAllScheduledNotifications();
+  const scheduledReminders = [];
+  const date = startDate;
+  for (let i = 0; i < quantity; i++) {
+    const scheduledReminder = await scheduleReminder(getRandomFutureTime(date));
+    if (scheduledReminder) {
+      scheduledReminders.push(scheduledReminder);
+    }
+    date.setDate(date.getDate() + 1);
+  }
+
+  await setScheduledReminders(scheduledReminders);
 };
 
-// Select random reminder
-const getRandomReminder = async () => {
-  let reminders = await getReminders();
-  const userSelectedCategories = await getUserSelectedCategories();
-  const pastReminders = await getPastReminders();
-  reminders = reminders.filter(
-    (reminder) =>
-      userSelectedCategories.includes(reminder.category) &&
-      !pastReminders.some((pastReminder) => pastReminder.id === reminder.id)
+export const cancelAllScheduledNotifications = async () => {
+  const pendingNotifications = await LocalNotifications.getPending();
+  if (pendingNotifications.notifications.length > 0) {
+    await LocalNotifications.cancel(pendingNotifications);
+  }
+};
+
+export const scheduleReminder = async (
+  date?: Date
+): Promise<ScheduledReminder | null> => {
+  // don't schedule a reminder if it's already scheduled
+  const pendingNotifications = await LocalNotifications.getPending();
+  const pendingReminderIds = pendingNotifications.notifications.map(
+    (n) => n.extra?.reminderId
   );
-  if (reminders.length === 0) return null;
-  const randomIndex = Math.floor(Math.random() * reminders.length);
-  return reminders[randomIndex];
-};
+  // don't schedule a reminder if it's a recently sent reminder
+  const pastReminders = await getRecentReminders();
+  const pastReminderIds = pastReminders.map((r) => r.id);
 
-export const scheduleDailyReminder = async () => {
-  const reminder = await getRandomReminder();
+  const excludeIds = pendingReminderIds.concat(pastReminderIds);
+  const reminder = await getRandomReminder(excludeIds);
   if (!reminder) {
     console.warn('No reminders available');
-    return;
+    return null;
   }
 
-  const randomTime = getRandomTime();
+  const reminderTime = date || new Date(new Date().getTime() + 100);
+  if (!reminderTime) {
+    console.warn('invalid reminder time: ', reminderTime);
+    return null;
+  }
 
+  const notificationId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
   await LocalNotifications.schedule({
     notifications: [
       {
         title: 'Reemind',
         body: reminder.quote,
-        id: Math.floor(Math.random() * 1000000), // Unique ID
+        id: notificationId,
         schedule: {
-          at: randomTime,
-          repeats: false, // We'll reschedule manually
+          at: reminderTime,
+          repeats: false,
         },
         sound: undefined,
         attachments: undefined,
@@ -79,26 +112,47 @@ export const scheduleDailyReminder = async () => {
     ],
   });
 
-  console.log(
-    `Scheduled notification for ${randomTime} with reminder: ${reminder.quote}`
-  );
+  return { notificationId, reminder, date: reminderTime };
 };
 
-export const setupNotificationListener = () => {
-  LocalNotifications.addListener(
-    'localNotificationActionPerformed',
-    async (notification) => {
-      const extra = notification.notification.extra;
+const getDaysSinceEpoch = (date: Date): number => {
+  return Math.floor(date.getTime() / (1000 * 60 * 60 * 24));
+};
 
-      if (extra?.reminderId) {
-        const reminder = await getReminderById(extra.reminderId);
-        if (reminder) {
-          await addPastReminder(reminder);
-        }
-      }
+const getRandomFutureTime = (date: Date = new Date()) => {
+  const now = new Date();
+  const nowDays = getDaysSinceEpoch(now);
+  const dateDays = getDaysSinceEpoch(date);
 
-      // Reschedule for the next day
-      await scheduleDailyReminder();
+  let startHour = parseInt(import.meta.env.REACT_APP_NOTIFICATION_START_HOUR || '8');
+  const endHour = parseInt(import.meta.env.REACT_APP_NOTIFICATION_END_HOUR || '17');
+  if (nowDays > dateDays) {
+    return;
+  } else if (nowDays === dateDays) {
+    startHour = now.getHours();
+    if (startHour > endHour) {
+      return;
     }
+  }
+
+  const randomHour = Math.floor(Math.random() * (endHour - startHour)) + startHour;
+  const randomMinute = Math.floor(Math.random() * 60);
+  const randomTime = new Date(date);
+  randomTime.setHours(randomHour, randomMinute, 0, 0);
+
+  return randomTime;
+};
+
+// Select random reminder
+const getRandomReminder = async (excludeIds: string[] = []) => {
+  let reminders = await getReminders();
+  const userSelectedCategories = await getUserSelectedCategories();
+  reminders = reminders.filter(
+    (reminder) =>
+      userSelectedCategories.includes(reminder.category) &&
+      !excludeIds.includes(reminder.id)
   );
+  if (reminders.length === 0) return null;
+  const randomIndex = Math.floor(Math.random() * reminders.length);
+  return reminders[randomIndex];
 };

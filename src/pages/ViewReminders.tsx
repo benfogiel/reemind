@@ -1,7 +1,7 @@
 import './pages.css';
 import '../theme/global.css';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   IonContent,
   IonPage,
@@ -23,41 +23,82 @@ import {
   deleteReminder,
   getFirstName,
   getUserSelectedCategories,
-  getPastReminders,
+  getRecentReminders,
+  firstReminderSent,
+  setFirstReminderSent,
+  addRecentReminder,
 } from '../services/preferences';
+import { scheduleReminder, rescheduleReminders } from '../services/notifications';
+import { requestNotificationPermissions } from '../services/notifications';
 
 const ViewReminders: React.FC = () => {
   const router = useIonRouter();
 
   const [categories, setCategories] = useState<string[]>([]);
   const [firstName, setFirstName] = useState<string>('');
-  const [pastReminders, setPastReminders] = useState<Reminder[]>([]);
+  const [recentReminders, setRecentReminders] = useState<Reminder[]>([]);
+
+  const loadRecentReminders = async () => {
+    const recentReminders = await getRecentReminders();
+    setRecentReminders(recentReminders);
+  };
+
+  const loadSelectedCategories = async () => {
+    const selectedCategories = await getUserSelectedCategories();
+    setCategories(selectedCategories);
+  };
+
+  const loadFirstName = async () => {
+    const firstName = await getFirstName();
+    setFirstName(firstName);
+  };
+
+  const setupNotifications = async () => {
+    const hasPermission = await requestNotificationPermissions();
+    if (!hasPermission) return;
+
+    const sentFirstReminder = await firstReminderSent();
+    if (!sentFirstReminder) {
+      const scheduledReminder = await scheduleReminder();
+      if (scheduledReminder) {
+        await addRecentReminder(scheduledReminder.reminder);
+      }
+      await loadRecentReminders();
+      await setFirstReminderSent(true);
+      // sleep to ensure first reminder is delivered
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    await rescheduleReminders();
+  };
+
+  useEffect(() => {
+    setupNotifications();
+  }, []);
 
   useIonViewWillEnter(() => {
-    const loadSelectedCategories = async () => {
-      const selectedCategories = await getUserSelectedCategories();
-      setCategories(selectedCategories);
-    };
-
-    const loadFirstName = async () => {
-      const firstName = await getFirstName();
-      setFirstName(firstName);
-    };
-
-    const loadPastReminders = async () => {
-      const pastReminders = await getPastReminders();
-      setPastReminders(pastReminders);
-    };
-
     loadSelectedCategories();
     loadFirstName();
-    loadPastReminders();
+    loadRecentReminders();
   });
 
-  const refresh = (e: CustomEvent) => {
-    setTimeout(() => {
-      e.detail.complete();
-    }, 3000);
+  const refresh = async (e: CustomEvent) => {
+    await loadSelectedCategories();
+    await loadFirstName();
+    await loadRecentReminders();
+    await setupNotifications();
+    e.detail.complete();
+  };
+
+  const handleAddReminder = async (reminder: Reminder) => {
+    await addReminder(reminder);
+    await rescheduleReminders();
+  };
+
+  const handleDeleteReminder = async (reminder: Reminder) => {
+    await deleteReminder(reminder);
+    await loadRecentReminders();
+    await rescheduleReminders();
   };
 
   return (
@@ -84,13 +125,16 @@ const ViewReminders: React.FC = () => {
         </IonRefresher>
 
         <div className="reminder-container">
-          <AddReminder categories={categories} addReminder={addReminder} />
+          <AddReminder categories={categories} addReminder={handleAddReminder} />
 
           <IonText>
             <h5>Past Reminders</h5>
           </IonText>
 
-          <ReminderList reminders={pastReminders} deleteReminder={deleteReminder} />
+          <ReminderList
+            reminders={recentReminders.reverse()}
+            deleteReminder={handleDeleteReminder}
+          />
         </div>
       </IonContent>
     </IonPage>

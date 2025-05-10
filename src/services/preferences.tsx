@@ -1,5 +1,6 @@
 import { Preferences } from '@capacitor/preferences';
 import { Reminder, isEqual } from '../data/reminders';
+import { ScheduledReminder } from './notifications';
 
 export const setFirstName = async (firstName: string) => {
   await Preferences.set({
@@ -44,13 +45,13 @@ export const deleteReminder = async (reminder: Reminder) => {
     await setReminders(reminders);
   }
 
-  const pastReminders = await getPastReminders();
+  const pastReminders = await getRecentReminders();
   const pastReminderIndex = pastReminders.findIndex((r: Reminder) =>
     isEqual(r, reminder)
   );
   if (pastReminderIndex !== -1) {
     pastReminders.splice(pastReminderIndex, 1);
-    await setPastReminders(pastReminders);
+    await setRecentReminders(pastReminders);
   }
 };
 
@@ -72,23 +73,51 @@ export const getUserSelectedCategories = async (): Promise<string[]> => {
   return JSON.parse(value || '[]');
 };
 
-export const getPastReminders = async (): Promise<Reminder[]> => {
+export const getRecentReminders = async (): Promise<Reminder[]> => {
   const { value } = await Preferences.get({ key: 'pastReminders' });
   return JSON.parse(value || '[]');
 };
 
-export const setPastReminders = async (reminders: Reminder[]) => {
+export const setRecentReminders = async (reminders: Reminder[]) => {
   await Preferences.set({
     key: 'pastReminders',
     value: JSON.stringify(reminders),
   });
 };
 
-export const addPastReminder = async (reminder: Reminder) => {
-  const pastReminders = await getPastReminders();
+export const addRecentReminder = async (reminder: Reminder) => {
+  const pastReminders = await getRecentReminders();
   pastReminders.push(reminder);
-  if (pastReminders.length > parseInt(process.env.REACT_APP_MAX_PAST_REMINDERS || '10')) {
+  if (
+    pastReminders.length > parseInt(import.meta.env.REACT_APP_MAX_PAST_REMINDERS || '10')
+  ) {
     pastReminders.shift();
   }
-  await setPastReminders(pastReminders);
+  await setRecentReminders(pastReminders);
+};
+
+export const firstReminderSent = async (): Promise<boolean> => {
+  const { value } = await Preferences.get({ key: 'firstReminderSent' });
+  return value === 'true';
+};
+
+export const setFirstReminderSent = async (sent: boolean) => {
+  await Preferences.set({ key: 'firstReminderSent', value: sent.toString() });
+};
+
+export const setScheduledReminders = async (reminders: ScheduledReminder[]) => {
+  await Preferences.set({
+    key: 'scheduledReminders',
+    value: JSON.stringify(reminders),
+  });
+};
+
+export const getScheduledReminders = async (): Promise<ScheduledReminder[]> => {
+  const { value } = await Preferences.get({ key: 'scheduledReminders' });
+  const scheduledRemindersJson = JSON.parse(value || '[]');
+  const scheduledReminders = scheduledRemindersJson.map((r: ScheduledReminder) => ({
+    ...r,
+    date: new Date(r.date),
+  }));
+  return scheduledReminders;
 };
