@@ -1,6 +1,5 @@
 .bottom-button {
   position: fixed;
-  bottom: 10px;
   left: 25px;
   right: 25px;
   width: calc(100% - 50px); /* Subtract the left and right margin */

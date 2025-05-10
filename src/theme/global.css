@@ -13,6 +13,10 @@ ion-item {
   height: 50px;
 }
 
+.page-footer {
+  margin-bottom: 85px;
+}
+
 ion-toast {
   --background: var(--ion-overlay-background-color);
 }
