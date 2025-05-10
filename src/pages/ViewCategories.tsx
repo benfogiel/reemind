@@ -21,7 +21,9 @@ import {
   getCategories,
   getUserSelectedCategories,
   setUserSelectedCategories,
+  firstReminderSent,
 } from '../services/preferences';
+import { rescheduleReminders } from '../services/notifications';
 
 const ViewCategories: React.FC = () => {
   const router = useIonRouter();
@@ -29,25 +31,25 @@ const ViewCategories: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+  const loadUserSelectedCategories = async () => {
+    const userSelectedCategories = await getUserSelectedCategories();
+    setSelectedCategories(userSelectedCategories);
+  };
+
+  const loadCategories = async () => {
+    const categories = await getCategories();
+    setCategories(categories);
+  };
+
   useIonViewWillEnter(() => {
-    const loadUserSelectedCategories = async () => {
-      const userSelectedCategories = await getUserSelectedCategories();
-      setSelectedCategories(userSelectedCategories);
-    };
-
-    const loadCategories = async () => {
-      const categories = await getCategories();
-      setCategories(categories);
-    };
-
     loadUserSelectedCategories();
     loadCategories();
   });
 
-  const refresh = (e: CustomEvent) => {
-    setTimeout(() => {
-      e.detail.complete();
-    }, 3000);
+  const refresh = async (e: CustomEvent) => {
+    await loadUserSelectedCategories();
+    await loadCategories();
+    e.detail.complete();
   };
 
   const onCategorySelect = (c: string) => {
@@ -58,7 +60,12 @@ const ViewCategories: React.FC = () => {
     }
   };
 
-  const onSave = () => {
+  const onSave = async () => {
+    const sentFirstReminder = await firstReminderSent();
+    if (sentFirstReminder) {
+      rescheduleReminders();
+    }
+
     setUserSelectedCategories(selectedCategories);
     router.push('/reminders-view');
   };
@@ -87,7 +94,7 @@ const ViewCategories: React.FC = () => {
         </IonList>
       </IonContent>
 
-      <IonFooter>
+      <IonFooter className="page-footer">
         <IonButton
           className="bottom-button"
           color="dark"
