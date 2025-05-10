@@ -66,7 +66,7 @@ const ViewReminders: React.FC = () => {
       await loadRecentReminders();
       await setFirstReminderSent(true);
       // sleep to ensure first reminder is delivered
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     await rescheduleReminders();
