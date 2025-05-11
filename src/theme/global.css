@@ -1,8 +1,4 @@
 /* This is added to prevent the flashing that happens when toggling between palettes */
-ion-item {
-  --transition: none;
-}
-
 .page-header {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -15,6 +11,10 @@ ion-item {
 
 .page-footer {
   margin-bottom: 85px;
+}
+
+ion-item {
+  --transition: none;
 }
 
 ion-toast {

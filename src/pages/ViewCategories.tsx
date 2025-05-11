@@ -72,7 +72,7 @@ const ViewCategories: React.FC = () => {
 
   return (
     <IonPage id="categories-view">
-      <IonHeader>
+      <IonHeader translucent>
         <div className="page-header">Choose Your Inspiration</div>
       </IonHeader>
 

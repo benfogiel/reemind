@@ -1,7 +1,7 @@
 import './pages.css';
 import '../theme/global.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   IonContent,
   IonPage,
@@ -100,7 +100,7 @@ const ViewReminders: React.FC = () => {
 
   return (
     <IonPage id="reminders-view">
-      <IonHeader>
+      <IonHeader translucent>
         <div className="page-header view-reminders-header">
           <IonText>
             <p style={{ fontSize: '10px', marginBottom: '0px', marginTop: '0px' }}>
