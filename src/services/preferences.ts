@@ -45,13 +45,13 @@ export const deleteReminder = async (reminder: Reminder) => {
     await setReminders(reminders);
   }
 
-  const pastReminders = await getRecentReminders();
-  const pastReminderIndex = pastReminders.findIndex((r: Reminder) =>
+  const recentReminders = await getRecentReminders();
+  const recentReminderIndex = recentReminders.findIndex((r: Reminder) =>
     isEqual(r, reminder)
   );
-  if (pastReminderIndex !== -1) {
-    pastReminders.splice(pastReminderIndex, 1);
-    await setRecentReminders(pastReminders);
+  if (recentReminderIndex !== -1) {
+    recentReminders.splice(recentReminderIndex, 1);
+    await setRecentReminders(recentReminders);
   }
 };
 
@@ -74,26 +74,27 @@ export const getUserSelectedCategories = async (): Promise<string[]> => {
 };
 
 export const getRecentReminders = async (): Promise<Reminder[]> => {
-  const { value } = await Preferences.get({ key: 'pastReminders' });
+  const { value } = await Preferences.get({ key: 'recentReminders' });
   return JSON.parse(value || '[]');
 };
 
 export const setRecentReminders = async (reminders: Reminder[]) => {
   await Preferences.set({
-    key: 'pastReminders',
+    key: 'recentReminders',
     value: JSON.stringify(reminders),
   });
 };
 
 export const addRecentReminder = async (reminder: Reminder) => {
-  const pastReminders = await getRecentReminders();
-  pastReminders.push(reminder);
+  const recentReminders = await getRecentReminders();
+  recentReminders.push(reminder);
   if (
-    pastReminders.length > parseInt(import.meta.env.REACT_APP_MAX_PAST_REMINDERS || '10')
+    recentReminders.length >
+    parseInt(import.meta.env.REACT_APP_MAX_RECENT_REMINDERS || '10')
   ) {
-    pastReminders.shift();
+    recentReminders.shift();
   }
-  await setRecentReminders(pastReminders);
+  await setRecentReminders(recentReminders);
 };
 
 export const firstReminderSent = async (): Promise<boolean> => {

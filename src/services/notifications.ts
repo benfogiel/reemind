@@ -8,6 +8,7 @@ import {
   addRecentReminder,
 } from './preferences';
 import { Reminder } from '../data/reminders';
+import { addDays, dateToDay, dayToDate } from '../util';
 
 export interface ScheduledReminder {
   notificationId: number;
@@ -26,10 +27,10 @@ export const requestNotificationPermissions = async () => {
 
 export const rescheduleReminders = async (quantity: number = 30) => {
   const now = new Date();
-  const startDate = now;
+  let startDate = new Date();
 
   // Get previously scheduled reminders that have already been sent
-  // and add to the past reminders list
+  // and add to the recent reminders list
   const previouslyScheduledReminders = await getScheduledReminders();
   for (const scheduledReminder of previouslyScheduledReminders) {
     if (scheduledReminder.date < now) {
@@ -37,23 +38,23 @@ export const rescheduleReminders = async (quantity: number = 30) => {
     }
     // if a reminder has already been sent today, start scheduling tomorrow
     if (
-      getDaysSinceEpoch(scheduledReminder.date) === getDaysSinceEpoch(now) &&
+      dateToDay(scheduledReminder.date) === dateToDay(now) &&
       scheduledReminder.date < now
     ) {
-      startDate.setDate(startDate.getDate() + 1);
+      startDate = addDays(startDate, 1);
     }
   }
 
   // Replace all scheduled reminders with new ones
   await cancelAllScheduledNotifications();
   const scheduledReminders = [];
-  const date = startDate;
+  let reminderDay = dateToDay(startDate);
   for (let i = 0; i < quantity; i++) {
-    const scheduledReminder = await scheduleReminder(getRandomFutureTime(date));
-    if (scheduledReminder) {
-      scheduledReminders.push(scheduledReminder);
-    }
-    date.setDate(date.getDate() + 1);
+    const reminderTime = getRandomFutureReminderTime(reminderDay);
+    const scheduledReminder = await scheduleReminder(reminderTime);
+    if (!scheduledReminder) break;
+    scheduledReminders.push(scheduledReminder);
+    reminderDay = dateToDay(reminderTime) + 1;
   }
 
   await setScheduledReminders(scheduledReminders);
@@ -67,7 +68,7 @@ export const cancelAllScheduledNotifications = async () => {
 };
 
 export const scheduleReminder = async (
-  date?: Date
+  reminderDate: Date
 ): Promise<ScheduledReminder | null> => {
   // don't schedule a reminder if it's already scheduled
   const pendingNotifications = await LocalNotifications.getPending();
@@ -75,19 +76,13 @@ export const scheduleReminder = async (
     (n) => n.extra?.reminderId
   );
   // don't schedule a reminder if it's a recently sent reminder
-  const pastReminders = await getRecentReminders();
-  const pastReminderIds = pastReminders.map((r) => r.id);
+  const recentReminders = await getRecentReminders();
+  const recentReminderIds = recentReminders.map((r) => r.id);
 
-  const excludeIds = pendingReminderIds.concat(pastReminderIds);
+  const excludeIds = pendingReminderIds.concat(recentReminderIds);
   const reminder = await getRandomReminder(excludeIds);
   if (!reminder) {
     console.warn('No reminders available');
-    return null;
-  }
-
-  const reminderTime = date || new Date(new Date().getTime() + 100);
-  if (!reminderTime) {
-    console.warn('invalid reminder time: ', reminderTime);
     return null;
   }
 
@@ -99,7 +94,7 @@ export const scheduleReminder = async (
         body: reminder.quote,
         id: notificationId,
         schedule: {
-          at: reminderTime,
+          at: reminderDate,
           repeats: false,
         },
         sound: undefined,
@@ -112,32 +107,33 @@ export const scheduleReminder = async (
     ],
   });
 
-  return { notificationId, reminder, date: reminderTime };
+  return { notificationId, reminder, date: reminderDate };
 };
 
-const getDaysSinceEpoch = (date: Date): number => {
-  return Math.floor(date.getTime() / (1000 * 60 * 60 * 24));
-};
-
-const getRandomFutureTime = (date: Date = new Date()) => {
+/**
+ * Get a random future reminder time.
+ * @param startDay - The day to start the search for a random reminder time
+ * @returns A random future reminder time between start and end reminder hours.
+ */
+const getRandomFutureReminderTime = (startDay: number): Date => {
   const now = new Date();
-  const nowDays = getDaysSinceEpoch(now);
-  const dateDays = getDaysSinceEpoch(date);
+  const nowDay = dateToDay(now);
 
   let startHour = parseInt(import.meta.env.REACT_APP_NOTIFICATION_START_HOUR || '8');
   const endHour = parseInt(import.meta.env.REACT_APP_NOTIFICATION_END_HOUR || '17');
-  if (nowDays > dateDays) {
-    return;
-  } else if (nowDays === dateDays) {
-    startHour = now.getHours();
-    if (startHour > endHour) {
-      return;
+
+  if (nowDay >= startDay) {
+    startDay = nowDay;
+    if (now.getHours() + 1 > endHour) {
+      startDay += 1;
+    } else {
+      startHour = now.getHours() + 1;
     }
   }
 
   const randomHour = Math.floor(Math.random() * (endHour - startHour)) + startHour;
   const randomMinute = Math.floor(Math.random() * 60);
-  const randomTime = new Date(date);
+  const randomTime = dayToDate(startDay);
   randomTime.setHours(randomHour, randomMinute, 0, 0);
 
   return randomTime;
